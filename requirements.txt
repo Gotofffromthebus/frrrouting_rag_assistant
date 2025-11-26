@@ -1,0 +1,9 @@
+requests>=2.28
+beautifulsoup4>=4.12
+tqdm
+html2text>=2024.2.26
+sentence-transformers>=2.2.0
+chromadb>=0.4.0
+numpy<2.0
+openai>=1.0.0
+google-generativeai>=0.3.0
