@@ -1,10 +1,5 @@
 #!/usr/bin/env python3
-"""
-Скрипт для запросов к векторной БД.
-
-Использование:
-    python query_db.py --query "How to configure BGP?" --n-results 5
-"""
+"""Query vector database."""
 
 import argparse
 import chromadb
@@ -13,39 +8,25 @@ from sentence_transformers import SentenceTransformer
 def query_vector_db(db_path: str, collection_name: str, query_text: str, 
                    n_results: int = 5, model_name: str = "all-mpnet-base-v2",
                    filter_dict: dict = None):
-    """
-    Выполняет запрос к векторной БД.
-    
-    Args:
-        db_path: Путь к векторной БД
-        collection_name: Название коллекции
-        query_text: Текст запроса
-        n_results: Количество результатов
-        model_name: Название модели для embeddings
-        filter_dict: Словарь для фильтрации по метаданным
-    """
-    # Подключение к БД
-    print(f"Подключение к БД: {db_path}")
+    """Query vector database."""
+    print(f"Connecting to DB: {db_path}")
     client = chromadb.PersistentClient(path=db_path)
     
     try:
         collection = client.get_collection(name=collection_name)
-        print(f"Коллекция '{collection_name}' найдена ({collection.count()} чанков)")
+        print(f"Collection '{collection_name}' found ({collection.count()} chunks)")
     except Exception as e:
-        print(f"Ошибка: коллекция '{collection_name}' не найдена")
-        print(f"Убедитесь, что векторная БД создана: python vectorize.py")
+        print(f"Error: collection '{collection_name}' not found")
+        print(f"Create vector DB first: python vectorize.py")
         return
     
-    # Загрузка модели
-    print(f"Загрузка модели: {model_name}")
+    print(f"Loading model: {model_name}")
     model = SentenceTransformer(model_name)
     
-    # Создание embedding для запроса
-    print(f"Обработка запроса: '{query_text}'")
+    print(f"Processing query: '{query_text}'")
     query_embedding = model.encode([query_text], show_progress_bar=False).tolist()[0]
     
-    # Поиск
-    print(f"Поиск {n_results} наиболее релевантных результатов...")
+    print(f"Searching {n_results} most relevant results...")
     
     query_kwargs = {
         "query_embeddings": [query_embedding],
@@ -54,17 +35,16 @@ def query_vector_db(db_path: str, collection_name: str, query_text: str,
     
     if filter_dict:
         query_kwargs["where"] = filter_dict
-        print(f"Применен фильтр: {filter_dict}")
+        print(f"Applied filter: {filter_dict}")
     
     results = collection.query(**query_kwargs)
     
-    # Вывод результатов
     print("\n" + "=" * 80)
-    print(f"Результаты поиска для: '{query_text}'")
+    print(f"Search results for: '{query_text}'")
     print("=" * 80)
     
     if not results['documents'] or not results['documents'][0]:
-        print("Результаты не найдены")
+        print("No results found")
         return
     
     for i, (doc, metadata, distance) in enumerate(zip(
@@ -72,32 +52,31 @@ def query_vector_db(db_path: str, collection_name: str, query_text: str,
         results['metadatas'][0],
         results['distances'][0] if 'distances' in results else [None] * len(results['documents'][0])
     ), 1):
-        # Исправляем расчет релевантности (distance может быть > 1)
         if distance is not None:
-            relevance = max(0, 1 - distance)  # Защита от отрицательных значений
-            print(f"\n[{i}] Релевантность: {relevance:.4f}")
+            relevance = max(0, 1 - distance)
+            print(f"\n[{i}] Relevance: {relevance:.4f}")
         else:
             print(f"\n[{i}]")
-        print(f"Заголовок: {metadata.get('title', 'Unknown')}")
+        print(f"Title: {metadata.get('title', 'Unknown')}")
         
         if 'section' in metadata:
-            print(f"Раздел: {metadata['section']}")
+            print(f"Section: {metadata['section']}")
         
         if 'url' in metadata:
             print(f"URL: {metadata['url']}")
         
-        print(f"\nТекст (первые 300 символов):")
+        print(f"\nText (first 300 chars):")
         print("-" * 80)
         print(doc[:300] + ("..." if len(doc) > 300 else ""))
         print("-" * 80)
 
 def main():
-    parser = argparse.ArgumentParser(description="Запросы к векторной БД")
-    parser.add_argument("--query", "-q", required=True, help="Текст запроса")
-    parser.add_argument("--db", default="vector_db", help="Путь к векторной БД")
-    parser.add_argument("--collection", default="frr_docs", help="Название коллекции")
-    parser.add_argument("--n-results", type=int, default=5, help="Количество результатов")
-    parser.add_argument("--model", default="all-mpnet-base-v2", help="Модель для embeddings")
+    parser = argparse.ArgumentParser(description="Query vector database")
+    parser.add_argument("--query", "-q", required=True, help="Query text")
+    parser.add_argument("--db", default="vector_db", help="Path to vector DB")
+    parser.add_argument("--collection", default="frr_docs", help="Collection name")
+    parser.add_argument("--n-results", type=int, default=5, help="Number of results")
+    parser.add_argument("--model", default="all-mpnet-base-v2", help="Embedding model")
     args = parser.parse_args()
     
     query_vector_db(

@@ -29,20 +29,18 @@ HEADERS = {
     "User-Agent": "fr-docs-scraper/1.0 (+https://example.com) - polite scraping for personal use"
 }
 
-# HTML to Markdown converter
 h2t = html2text.HTML2Text()
-h2t.ignore_links = False  # сохраняем ссылки
-h2t.ignore_images = True  # игнорируем изображения
-h2t.body_width = 0  # не переносим строки
-h2t.unicode_snob = True  # лучше обрабатываем unicode
+h2t.ignore_links = False
+h2t.ignore_images = True
+h2t.body_width = 0
+h2t.unicode_snob = True
 
-# A list of file extensions we DON'T want to fetch as pages
 NON_HTML_EXTENSIONS = (
     ".png", ".jpg", ".jpeg", ".gif", ".svg",
     ".pdf", ".zip", ".tar", ".gz", ".tgz",
     ".css", ".js", ".woff", ".woff2", ".ico",
     ".mp4", ".avi", ".mov", ".exe", ".rpm",
-    ".deb", ".rst", ".md", ".txt"  # keep .txt out because we want rendered html text
+    ".deb", ".rst", ".md", ".txt"
 )
 
 def is_html_like(url: str) -> bool:

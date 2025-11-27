@@ -37,13 +37,14 @@ ENV/
 *.log
 my_scraper.log
 
-# Data files
+# Generated data files
 fr_docs/
 chunks.json
 vector_db/
 *.db
 *.sqlite
 *.sqlite3
+*.metadata.json
 
 # Environment variables
 .env
