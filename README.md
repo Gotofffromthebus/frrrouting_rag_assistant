@@ -10,6 +10,26 @@ RAG system for FRRouting documentation. Ask questions in natural language and ge
 - Document chunking for vector search
 - Adaptive relevance thresholding
 
+## Pipeline
+
+```mermaid
+graph LR
+    A[Documentation<br/>Website] -->|scraper.py| B[Markdown<br/>Files]
+    B -->|chunking.py| C[Semantic<br/>Chunks]
+    C -->|vectorize.py| D[Vector<br/>Embeddings]
+    D -->|ChromaDB| E[Vector<br/>Database]
+    E -->|rag_query.py| F[Semantic<br/>Search]
+    F -->|LLM| G[Natural<br/>Answer]
+    
+    style A fill:#e1f5ff
+    style B fill:#fff4e1
+    style C fill:#e8f5e9
+    style D fill:#f3e5f5
+    style E fill:#fff9c4
+    style F fill:#ffebee
+    style G fill:#e8f5e9
+```
+
 ## Quick Start
 
 See [QUICKSTART.md](QUICKSTART.md) for minimal setup instructions.
