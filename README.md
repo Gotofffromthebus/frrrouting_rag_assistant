@@ -21,13 +21,13 @@ graph LR
     E -->|rag_query.py| F[Semantic<br/>Search]
     F -->|LLM| G[Natural<br/>Answer]
     
-    style A fill:#e1f5ff
-    style B fill:#fff4e1
-    style C fill:#e8f5e9
-    style D fill:#f3e5f5
-    style E fill:#fff9c4
-    style F fill:#ffebee
-    style G fill:#e8f5e9
+    style A fill:#2196F3,stroke:#1976D2,stroke-width:2px,color:#fff
+    style B fill:#FF9800,stroke:#F57C00,stroke-width:2px,color:#fff
+    style C fill:#4CAF50,stroke:#388E3C,stroke-width:2px,color:#fff
+    style D fill:#9C27B0,stroke:#7B1FA2,stroke-width:2px,color:#fff
+    style E fill:#FFC107,stroke:#F9A825,stroke-width:2px,color:#000
+    style F fill:#F44336,stroke:#D32F2F,stroke-width:2px,color:#fff
+    style G fill:#00BCD4,stroke:#0097A7,stroke-width:2px,color:#fff
 ```
 
 ## Quick Start
