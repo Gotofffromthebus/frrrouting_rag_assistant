@@ -142,13 +142,15 @@ def search_in_db(db_path: str, collection_name: str, query_text: str,
     
     return results, actual_threshold
 
-def format_context(results, show_relevance: bool = False):
+def format_context(results, show_relevance: bool = False, max_chunks: int = 15):
     """Format found chunks into context for LLM."""
     context_parts = []
     
     distances = results.get('distances', [[]])[0] if 'distances' in results else []
+    documents = results['documents'][0][:max_chunks]
+    metadatas = results['metadatas'][0][:max_chunks]
     
-    for i, (doc, metadata) in enumerate(zip(results['documents'][0], results['metadatas'][0]), 1):
+    for i, (doc, metadata) in enumerate(zip(documents, metadatas), 1):
         title = metadata.get('title', 'Unknown')
         section = metadata.get('section', 'N/A')
         url = metadata.get('url', 'N/A')
@@ -311,7 +313,7 @@ def generate_answer_gemini(query: str, context: str, api_key: str, model: str = 
         # Генерируем ответ
         generation_config = {
             "temperature": 0.3,
-            "max_output_tokens": 2000,  # Увеличено для более длинных ответов
+            "max_output_tokens": 8000,  # Увеличено для более длинных ответов
         }
         response = model_instance.generate_content(
             prompt,
@@ -420,8 +422,11 @@ def main():
             print(f"   ... and {num_found - 5} more fragments")
         print()
     
-    # Форматируем контекст
-    context = format_context(results, show_relevance=args.show_relevance)
+    # Форматируем контекст (ограничиваем количество чанков для LLM)
+    max_context_chunks = min(15, num_found)  # Используем максимум 15 самых релевантных чанков
+    if num_found > max_context_chunks:
+        print(f"   Using top {max_context_chunks} most relevant chunks for LLM context")
+    context = format_context(results, show_relevance=args.show_relevance, max_chunks=max_context_chunks)
     
     # Генерируем ответ
     print("Generating answer...\n")
